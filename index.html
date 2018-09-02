@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="fr">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link href="normalize.css" rel="stylesheet"/>
+        <link href="style.css" rel="stylesheet"/>
+        <title>Sticky notes !</title>
+    </head>
+    <body>
+        <div class="header">
+            <div class="container">
+                <h1>Noter, Garder, Partager !</h1>
+                <div class="container_menu">
+                    <div class="tab tab--top_left">
+                        <div class="tab__icon url size">
+                        </div>
+                        <p class="tab__icon_text">URL</p>
+                    </div>
+                    <div class="tab">
+                        <div class="tab__icon picture size">
+                        </div>
+                        <p class="tab__icon_text">Photo</p>
+                    </div>
+                    <div class="tab">
+                        <div class="tab__icon date size">
+                        </div>
+                        <p class="tab__icon_text">Date</p>
+                    </div>
+                    <div class="tab tab--top_right">
+                        <div class="tab__icon place size">
+                        </div>
+                        <p class="tab__icon_text">Lieu</p>
+                    </div>
+                </div>
+                <div class="lockarea">
+                    <textarea placeholder="Je me laisse une note..." class="textarea" rows="3" cols="50"></textarea>
+                </div>
+                <div style="text-align:right">
+                    <button class="publier">Publier</button>
+                </div>
+            </div>
+        </div>
+        <div class="content">
+            <div class="content_container"></div>
+        </div>
+    </body>
+    <script>
+
+        //FUNCTIONS
+        var $ = function(query){
+            return document.querySelector(query);
+        }
+        var $$ = function(query){
+            return Array.from(document.querySelectorAll(query));
+        }
+        
+        var displayMessageWithDiv = function(date, value){
+            var messageDiv = document.createElement('div');
+            var messageHeaderDiv = document.createElement('div');
+            var messageContentDiv = document.createElement('div');
+            messageDiv.className = 'message';
+            messageHeaderDiv.className = 'message_header';
+            messageContentDiv.className = 'message_content';
+            
+            messageContentDiv.append(value);
+            messageHeaderDiv.append(date);
+            messageDiv.append(messageHeaderDiv);
+            messageDiv.append(messageContentDiv);
+            $('.content_container').append(messageDiv);
+        };
+        
+        var currentDate = function(){
+            var today = new Date();
+            var dd = today.getDate();
+            var mm = today.getMonth(); //January is 0!
+            var yyyy = today.getFullYear();
+            var hh = today.getHours();
+            var mn = today.getMinutes();
+            
+            var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour:'2-digit', minute:'2-digit'};
+
+            return new Date(yyyy, mm, dd, hh, mn).toLocaleDateString('fr-FR', options);
+        };
+        //INITIALIZE COUNTER
+        var count;
+        if(!localStorage.getItem('count')){
+            count = 0;
+        }else{
+            count = localStorage.getItem('count');
+            (function(){
+                for(var i =0; i< localStorage.length; i++){
+                    if(localStorage.getItem('id_message_content_'+i)){
+                        displayMessageWithDiv(localStorage.getItem('id_message_header_'+i), localStorage.getItem('id_message_content_'+i));
+                    }
+                }
+            })();
+        }
+
+        
+        //Debug
+        console.log('COUNT = '+count);
+
+        //EVENT LISTENER FOR THE BUTTON
+        $('.publier').addEventListener("click", function(){
+            var date = currentDate();
+            localStorage.setItem("id_message_header_"+count, date);
+            localStorage.setItem("id_message_content_"+count++, $('.textarea').value);
+            localStorage.setItem('count', count);
+            displayMessageWithDiv(date, $('.textarea').value);
+            $('.textarea').value = "";
+        });
+
+    </script>
+</html>
